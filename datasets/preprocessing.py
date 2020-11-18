@@ -26,9 +26,5 @@ def setup_logger():
     logger.addHandler(fh)
 
 
-def get_train_images():
-    pass
-
-
 if __name__ == "__main__":
     pass
