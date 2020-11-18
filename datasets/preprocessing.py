@@ -1,4 +1,6 @@
+import os
 import logging
+from typing import Dict, Any, Union
 
 import cv2
 import numpy as np
@@ -27,13 +29,20 @@ def setup_logger():
     logger.addHandler(fh)
 
 
-def parse_config(yaml_path: str):
+def parse_config(yaml_path: str) -> Union[Dict[str, Any], None]:
+    """
+    #TODO: Add docstring
+
+    :param yaml_path:
+    :return:
+    """
     with open(yaml_path, "r") as yaml_file:
         loaded_yaml = yaml.safe_load(yaml_file)
     return loaded_yaml
 
 
-def get_train_images():
+def get_train_images(config: Dict[str, Any]) -> np.ndarray:
+    data_root = os.listdir(os.path.join(config.get("data_path"), config.get("class_root_path")))
     pass
 
 

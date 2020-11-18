@@ -1,2 +1,2 @@
 data_path: "datasets/CX-Brights"
-class_name: "OD_bright/korozia"
+class_root_path: "OD_bright/korozia"
