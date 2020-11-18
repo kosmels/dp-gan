@@ -1,6 +1,6 @@
-import os
 import logging
-from typing import Dict, Any, Union
+import os
+from typing import Any, Dict, Union
 
 import cv2
 import numpy as np
@@ -46,7 +46,6 @@ def get_train_images(config: Dict[str, Any]) -> np.ndarray:
     image_paths = os.listdir(data_root)
     for image_path in image_paths:
         image = cv2.imread(os.path.join(data_root, image_path))
-        cv2.imshow("Image", image)
         break
 
 

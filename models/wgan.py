@@ -31,7 +31,6 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
-
 """
 ## Prepare Fashion-MNIST data
 We will be using the [Fashion-MNIST](https://github.com/zalandoresearch/fashion-mnist) dataset
@@ -80,9 +79,7 @@ def conv_block(
     use_dropout=False,
     drop_value=0.5,
 ):
-    x = layers.Conv2D(
-        filters, kernel_size, strides=strides, padding=padding, use_bias=use_bias
-    )(x)
+    x = layers.Conv2D(filters, kernel_size, strides=strides, padding=padding, use_bias=use_bias)(x)
     if use_bn:
         x = layers.BatchNormalization()(x)
     x = activation(x)
@@ -170,9 +167,7 @@ def upsample_block(
     drop_value=0.3,
 ):
     x = layers.UpSampling2D(up_size)(x)
-    x = layers.Conv2D(
-        filters, kernel_size, strides=strides, padding=padding, use_bias=use_bias
-    )(x)
+    x = layers.Conv2D(filters, kernel_size, strides=strides, padding=padding, use_bias=use_bias)(x)
 
     if use_bn:
         x = layers.BatchNormalization()(x)
@@ -211,9 +206,7 @@ def get_generator_model():
         padding="same",
         use_dropout=False,
     )
-    x = upsample_block(
-        x, 1, layers.Activation("tanh"), strides=(1, 1), use_bias=False, use_bn=True
-    )
+    x = upsample_block(x, 1, layers.Activation("tanh"), strides=(1, 1), use_bias=False, use_bn=True)
     # At this point, we have an output which has the same shape as the input, (32, 32, 1).
     # We will use a Cropping2D layer to make it (28, 28, 1).
     x = layers.Cropping2D((2, 2))(x)
@@ -256,7 +249,7 @@ class WGAN(keras.Model):
         self.g_loss_fn = g_loss_fn
 
     def gradient_penalty(self, batch_size, real_images, fake_images):
-        """ Calculates the gradient penalty.
+        """Calculates the gradient penalty.
         This loss is calculated on an interpolated image
         and added to the discriminator loss.
         """
@@ -299,9 +292,7 @@ class WGAN(keras.Model):
         # as compared to 5 to reduce the training time.
         for i in range(self.d_steps):
             # Get the latent vector
-            random_latent_vectors = tf.random.normal(
-                shape=(batch_size, self.latent_dim)
-            )
+            random_latent_vectors = tf.random.normal(shape=(batch_size, self.latent_dim))
             with tf.GradientTape() as tape:
                 # Generate fake images from the latent vector
                 fake_images = self.generator(random_latent_vectors, training=True)
@@ -320,9 +311,7 @@ class WGAN(keras.Model):
             # Get the gradients w.r.t the discriminator loss
             d_gradient = tape.gradient(d_loss, self.discriminator.trainable_variables)
             # Update the weights of the discriminator using the discriminator optimizer
-            self.d_optimizer.apply_gradients(
-                zip(d_gradient, self.discriminator.trainable_variables)
-            )
+            self.d_optimizer.apply_gradients(zip(d_gradient, self.discriminator.trainable_variables))
 
         # Train the generator now.
         # Get the latent vector
@@ -338,9 +327,7 @@ class WGAN(keras.Model):
         # Get the gradients w.r.t the generator loss
         gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
         # Update the weights of the generator using the generator optimizer
-        self.g_optimizer.apply_gradients(
-            zip(gen_gradient, self.generator.trainable_variables)
-        )
+        self.g_optimizer.apply_gradients(zip(gen_gradient, self.generator.trainable_variables))
         return {"d_loss": d_loss, "g_loss": g_loss}
 
 
@@ -371,12 +358,8 @@ class GANMonitor(keras.callbacks.Callback):
 
 # Optimizer for both the networks
 # learning_rate=0.0002, beta_1=0.5 are recommened
-generator_optimizer = keras.optimizers.Adam(
-    learning_rate=0.0002, beta_1=0.5, beta_2=0.9
-)
-discriminator_optimizer = keras.optimizers.Adam(
-    learning_rate=0.0002, beta_1=0.5, beta_2=0.9
-)
+generator_optimizer = keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
+discriminator_optimizer = keras.optimizers.Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
 
 # Define the loss functions to be used for discrimiator
 # This should be (fake_loss - real_loss)
@@ -417,4 +400,4 @@ wgan.compile(
 # Start training
 # wgan.fit(train_images, batch_size=BATCH_SIZE, epochs=epochs, callbacks=[cbk])
 
-print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))

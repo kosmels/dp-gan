@@ -1,7 +1,7 @@
 FROM tensorflow/tensorflow:2.3.1-gpu
 
 # install opencv required libs
-RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev
+RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev libgl1-mesa-dev
 
 WORKDIR /dp-gan
 
