@@ -2,6 +2,7 @@ import logging
 
 import cv2
 import numpy as np
+import yaml
 
 
 def setup_logger():
@@ -24,6 +25,16 @@ def setup_logger():
 
     # add the handlers to the logger
     logger.addHandler(fh)
+
+
+def parse_config(yaml_path: str):
+    with open(yaml_path, "r") as yaml_file:
+        loaded_yaml = yaml.safe_load(yaml_file)
+    return loaded_yaml
+
+
+def get_train_images():
+    pass
 
 
 if __name__ == "__main__":
