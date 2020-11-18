@@ -415,4 +415,6 @@ wgan.compile(
 )
 
 # Start training
-wgan.fit(train_images, batch_size=BATCH_SIZE, epochs=epochs, callbacks=[cbk])
+# wgan.fit(train_images, batch_size=BATCH_SIZE, epochs=epochs, callbacks=[cbk])
+
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
