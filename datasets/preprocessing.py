@@ -42,9 +42,15 @@ def parse_config(yaml_path: str) -> Union[Dict[str, Any], None]:
 
 
 def get_train_images(config: Dict[str, Any]) -> np.ndarray:
-    data_root = os.listdir(os.path.join(config.get("data_path"), config.get("class_root_path")))
-    pass
+    data_root = os.path.join(config.get("data_path"), config.get("class_root_path"))
+    image_paths = os.listdir(data_root)
+    for image_path in image_paths:
+        image = cv2.imread(os.path.join(data_root, image_path))
+        cv2.imshow("Image", image)
+        break
 
 
 if __name__ == "__main__":
-    pass
+    yaml_path = "configs/wpgan_config_default.yml"
+    dataset_config = parse_config(yaml_path)['dataset']
+    get_train_images(dataset_config)
