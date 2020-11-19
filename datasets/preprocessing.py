@@ -44,12 +44,15 @@ def parse_config(yaml_path: str) -> Union[Dict[str, Any], None]:
 def get_train_images(config: Dict[str, Any]) -> np.ndarray:
     data_root = os.path.join(config.get("data_path"), config.get("class_root_path"))
     image_paths = os.listdir(data_root)
+    train_images = []
     for image_path in image_paths:
-        image = cv2.imread(os.path.join(data_root, image_path))
-        break
+        train_images.append(cv2.imread(os.path.join(data_root, image_path)))
+
+    return np.array(train_images)
 
 
 if __name__ == "__main__":
     yaml_path = "configs/wpgan_config_default.yml"
     dataset_config = parse_config(yaml_path)['dataset']
-    get_train_images(dataset_config)
+    train_images = get_train_images(dataset_config)
+    print(train_images.shape)

@@ -5,6 +5,7 @@ Date created: 2020/05/9
 Last modified: 2020/05/9
 Description: Implementation of Wasserstein GAN with Gradient Penalty.
 """
+from datasets.preprocessing import get_train_images, parse_config
 
 """
 ## Wasserstein GAN (WGAN) with Gradient Penalty (GP)
@@ -26,7 +27,7 @@ norm of the discriminator gradients close to 1.
 ## Setup
 """
 
-import numpy as np
+import cv2
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -38,18 +39,21 @@ in this example to demonstrate the training of WGAN-GP. Each sample in this data
 grayscale image associated with a label from 10 classes (e.g. Trouser, Pullover, Sneaker, etc.)
 """
 
-IMG_SHAPE = (28, 28, 1)
-BATCH_SIZE = 512
+IMG_SHAPE = (224, 224, 3)
+BATCH_SIZE = 32
 
 # Size of noise vector
 noise_dim = 128
 
-fashion_mnist = keras.datasets.fashion_mnist
-(train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
-print(f"Number of examples: {len(train_images)}")
-print(f"Shape of the images in the dataset: {train_images.shape[1:]}")
+# fashion_mnist = keras.datasets.fashion_mnist
+# (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
+# print(f"Number of examples: {len(train_images)}")
+# print(f"Shape of the images in the dataset: {train_images.shape[1:]}")
 
 # we will reshape each sample to (28, 28, 1) and normalize the pixel values in [-1, 1].
+yaml_path = "configs/wpgan_config_default.yml"
+dataset_config = parse_config(yaml_path)["dataset"]
+train_images = get_train_images(dataset_config)
 train_images = train_images.reshape(train_images.shape[0], *IMG_SHAPE).astype("float32")
 train_images = (train_images - 127.5) / 127.5
 
@@ -181,11 +185,11 @@ def upsample_block(
 
 def get_generator_model():
     noise = layers.Input(shape=(noise_dim,))
-    x = layers.Dense(4 * 4 * 256, use_bias=False)(noise)
+    x = layers.Dense(7 * 7 * 256, use_bias=False)(noise)
     x = layers.BatchNormalization()(x)
     x = layers.LeakyReLU(0.2)(x)
 
-    x = layers.Reshape((4, 4, 256))(x)
+    x = layers.Reshape((7, 7, 256))(x)
     x = upsample_block(
         x,
         128,
@@ -206,10 +210,27 @@ def get_generator_model():
         padding="same",
         use_dropout=False,
     )
-    x = upsample_block(x, 1, layers.Activation("tanh"), strides=(1, 1), use_bias=False, use_bn=True)
-    # At this point, we have an output which has the same shape as the input, (32, 32, 1).
-    # We will use a Cropping2D layer to make it (28, 28, 1).
-    x = layers.Cropping2D((2, 2))(x)
+    x = upsample_block(
+        x,
+        32,
+        layers.LeakyReLU(0.2),
+        strides=(1, 1),
+        use_bias=False,
+        use_bn=True,
+        padding="same",
+        use_dropout=False,
+    )
+    x = upsample_block(
+        x,
+        16,
+        layers.LeakyReLU(0.2),
+        strides=(1, 1),
+        use_bias=False,
+        use_bn=True,
+        padding="same",
+        use_dropout=False,
+    )
+    x = upsample_block(x, 3, layers.Activation("tanh"), strides=(1, 1), use_bias=False, use_bn=True)
 
     g_model = keras.models.Model(noise, x, name="generator")
     return g_model
@@ -346,10 +367,10 @@ class GANMonitor(keras.callbacks.Callback):
         generated_images = self.model.generator(random_latent_vectors)
         generated_images = (generated_images * 127.5) + 127.5
 
-        for i in range(self.num_img):
-            img = generated_images[i].numpy()
-            img = keras.preprocessing.image.array_to_img(img)
-            img.save("generated_img_{i}_{epoch}.png".format(i=i, epoch=epoch))
+        if (epoch + 1) % 10 == 0:
+            for i in range(self.num_img):
+                img = generated_images[i].numpy()
+                cv2.imwrite(f"outputs/generated_img_{epoch}_{i}.png", img)
 
 
 """
@@ -376,7 +397,7 @@ def generator_loss(fake_img):
 
 
 # Epochs to train
-epochs = 20
+epochs = 500
 
 # Callbacks
 cbk = GANMonitor(num_img=3, latent_dim=noise_dim)
@@ -398,6 +419,6 @@ wgan.compile(
 )
 
 # Start training
-# wgan.fit(train_images, batch_size=BATCH_SIZE, epochs=epochs, callbacks=[cbk])
+wgan.fit(train_images, batch_size=BATCH_SIZE, epochs=epochs, callbacks=[cbk])
 
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))
