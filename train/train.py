@@ -27,11 +27,10 @@ if __name__ == "__main__":
 
     # Optimizer for both the networks
     # learning_rate=0.0002, beta_1=0.5 are recommened
-    generator_optimizer = Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
-    discriminator_optimizer = Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
-
-    # Epochs to train
-    epochs = 500
+    g_beta_1, g_beta_2 = train_config["generator_betas"][0], train_config["generator_betas"][1]
+    generator_optimizer = Adam(learning_rate=train_config["generator_lr"], beta_1=g_beta_1, beta_2=g_beta_2)
+    d_beta_1, d_beta_2 = train_config["discriminator_betas"][0], train_config["discriminator_betas"][1]
+    discriminator_optimizer = Adam(learning_rate=train_config["discriminator_lr"], beta_1=0.5, beta_2=0.9)
 
     # Callbacks
     cbk = GANMonitor(num_img=3, latent_dim=dataset_config["noise_dim"])
@@ -53,4 +52,4 @@ if __name__ == "__main__":
     )
 
     # Start training
-    wgan.fit(train_images, batch_size=train_config["batch_size"], epochs=epochs, callbacks=[cbk])
+    wgan.fit(train_images, batch_size=train_config["batch_size"], epochs=train_config["epochs"], callbacks=[cbk])
