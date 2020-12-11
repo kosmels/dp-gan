@@ -12,11 +12,39 @@ crop the final output to match the shape with input shape.
 """
 from typing import Tuple
 
-from tensorflow.keras.layers import (Dense, Dropout, Flatten, Input, LeakyReLU,
+import tensorflow as tf
+from tensorflow.keras.layers import (BatchNormalization, Conv2D, Dense,
+                                     Dropout, Flatten, Input, LeakyReLU,
                                      ZeroPadding2D)
 from tensorflow.keras.models import Model
 
 from models.custom_layers import conv_block
+
+
+def get_discriminator_model_v2(img_shape: Tuple[int, int, int], class_dim: int):
+    img_input = Input(shape=img_shape, dtype=tf.float32)
+    x = Conv2D(16, kernel_size=3, strides=2, padding="same")(img_input)
+    x = LeakyReLU(alpha=0.2)(x)
+    x = Dropout(0.25)(x)
+    x = Conv2D(32, kernel_size=3, strides=2, padding="same")(x)
+    x = ZeroPadding2D(padding=((0, 1), (0, 1)))(x)
+    x = LeakyReLU(alpha=0.2)(x)
+    x = Dropout(0.25)(x)
+    x = BatchNormalization(momentum=0.8)(x)
+    x = Conv2D(64, kernel_size=3, strides=2, padding="same")(x)
+    x = LeakyReLU(alpha=0.2)(x)
+    x = Dropout(0.25)(x)
+    x = BatchNormalization(momentum=0.8)(x)
+    x = Conv2D(128, kernel_size=3, strides=1, padding="same")(x)
+    x = LeakyReLU(alpha=0.2)(x)
+    x = Dropout(0.25)(x)
+    x = Flatten()(x)
+
+    real_prob_output = Dense(1, activation="sigmoid")(x)
+    class_output = Dense(class_dim, activation="softmax")(x)
+
+    d_model = Model(img_input, [real_prob_output, class_output], name="discriminator")
+    return d_model
 
 
 def get_discriminator_model(img_shape: Tuple[int, int, int]):

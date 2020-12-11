@@ -1,21 +1,22 @@
 import tensorflow as tf
-from tensorflow.keras.layers import (Activation, BatchNormalization, Dense,
-                                     Input, LeakyReLU, Reshape, Flatten, Embedding, UpSampling2D, Conv2D)
+from tensorflow.keras.layers import (Activation, BatchNormalization, Conv2D,
+                                     Dense, Embedding, Flatten, Input,
+                                     LeakyReLU, Reshape, UpSampling2D)
 from tensorflow.keras.models import Model
 
 from models.custom_layers import upsample_block
 
 
-def get_acgan_generator_model(noise_dim: int, class_dim: int, architecture: str = 'acgan'):
+def get_generator_model_v2(noise_dim: int, class_dim: int, architecture: str = "acgan"):
     # https://github.com/eriklindernoren/Keras-GAN/blob/master/acgan/acgan.py
 
     noise = Input(shape=(noise_dim,), dtype=tf.float32)
-    labels = Input(shape=(1, ), dtype=tf.int32)
+    labels = Input(shape=(1,), dtype=tf.int32)
     input_embedding = Flatten(Embedding(class_dim, noise_dim)(labels))
 
     x = Dense(7 * 7 * 256, activation="relu")(input_embedding)
     x = Reshape((7, 7, 256))(x)
-    if architecture == 'acgan':
+    if architecture == "acgan":
         x = BatchNormalization(momentum=0.8)(x)
         x = UpSampling2D()(x)
         x = Conv2D(128, kernel_size=3, padding="same", activation="relu")(x)
@@ -34,8 +35,9 @@ def get_acgan_generator_model(noise_dim: int, class_dim: int, architecture: str 
 
         return Model([noise, labels], output)
     else:
-        assert architecture == 'wgan', f"You passed wrong 'architecture' argument: {architecture}." \
-                                       f"Available architectures: 'acgan', 'wgan'"
+        assert architecture == "wgan", (
+            f"You passed wrong 'architecture' argument: {architecture}." f"Available architectures: 'acgan', 'wgan'"
+        )
         # TODO: Add generator architecture from WGAN below
 
 
