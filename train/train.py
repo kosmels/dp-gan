@@ -44,12 +44,8 @@ if __name__ == "__main__":
     )
 
     # Compile the wgan model
-    wgan.compile(
-        d_optimizer=discriminator_optimizer,
-        g_optimizer=generator_optimizer,
-        g_loss_fn=generator_loss,
-        d_loss_fn=discriminator_loss,
-    )
+    wgan.compile(d_optimizer=discriminator_optimizer, g_optimizer=generator_optimizer, d_loss_fn=discriminator_loss,
+                 g_loss_fn=generator_loss)
 
     # Start training
     wgan.fit(train_images, batch_size=train_config["batch_size"], epochs=train_config["epochs"], callbacks=[cbk])
