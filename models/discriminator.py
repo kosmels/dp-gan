@@ -40,8 +40,8 @@ def get_discriminator_model_v2(img_shape: Tuple[int, int, int], class_dim: int):
     x = Dropout(0.25)(x)
     x = Flatten()(x)
 
-    real_prob_output = Dense(1, activation="sigmoid")(x)
-    class_output = Dense(class_dim, activation="softmax")(x)
+    real_prob_output = Dense(1)(x)
+    class_output = Dense(class_dim)(x)
 
     d_model = Model(img_input, [real_prob_output, class_output], name="discriminator")
     return d_model
