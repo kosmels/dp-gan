@@ -121,7 +121,3 @@ class WGAN(Model):
         # Update the weights of the generator using the generator optimizer
         self.g_optimizer.apply_gradients(zip(gen_gradient, self.generator.trainable_variables))
         return {"d_loss": d_loss, "g_loss": g_loss}
-
-
-class ACGAN(Model):
-    pass

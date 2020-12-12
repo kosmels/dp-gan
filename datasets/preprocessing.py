@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, Dict, Union
+from typing import Any, Dict, Tuple, Union
 
 import cv2
 import numpy as np
@@ -51,8 +51,22 @@ def get_train_images(config: Dict[str, Any]) -> np.ndarray:
     return np.array(train_images)
 
 
+def get_acgan_train_games(config: Dict[str, Any]) -> Tuple[np.ndarray, np.ndarray]:
+    class_folders = config.get("class_root_path")
+    train_images = []
+    train_labels = np.array([], dtype=np.int32)
+    for class_idx, folder in enumerate(class_folders):
+        data_root = os.path.join(config.get("data_path"), folder)
+        image_paths = os.listdir(data_root)
+        for image_path in image_paths:
+            train_images.append(cv2.imread(os.path.join(data_root, image_path)))
+        train_labels = np.append(train_labels, np.full((len(image_paths, )), fill_value=class_idx, dtype=np.int32))
+
+    train_labels = np.array(train_labels).reshape((-1, 1))
+    return np.array(train_images), train_labels
+
+
 if __name__ == "__main__":
-    yaml_path = "configs/wpgan_config_default.yml"
+    yaml_path = "configs/acgan_config_default.yml"
     dataset_config = parse_config(yaml_path)['dataset']
-    train_images = get_train_images(dataset_config)
-    print(train_images.shape)
+    X_train, y_train = get_acgan_train_games(dataset_config)

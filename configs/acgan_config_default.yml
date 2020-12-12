@@ -1,0 +1,16 @@
+dataset:
+  data_path: "datasets/CX-Brights"
+  class_root_path: ["OD_bright/korozia", "OD_bright/cierneFlaky", "OD_bright/otlakPriecny"]
+  image_shape: [224, 224, 3]
+  noise_dim: 128
+
+model:
+  type: "WGAN"
+
+train:
+  batch_size: 32
+  epochs: 5000
+  generator_lr: 0.0002
+  generator_betas: [0.5, 0.9]
+  discriminator_lr: 0.0002
+  discriminator_betas: [0.5, 0.9]
