@@ -1,7 +1,8 @@
 import tensorflow as tf
 from tensorflow.keras.layers import (Activation, BatchNormalization, Conv2D,
                                      Dense, Embedding, Flatten, Input,
-                                     LeakyReLU, Reshape, UpSampling2D)
+                                     LeakyReLU, Reshape, UpSampling2D,
+                                     multiply)
 from tensorflow.keras.models import Model
 
 from models.custom_layers import upsample_block
@@ -12,9 +13,10 @@ def get_generator_model_v2(noise_dim: int, class_dim: int, architecture: str = "
 
     noise = Input(shape=(noise_dim,), dtype=tf.float32)
     labels = Input(shape=(1,), dtype=tf.int32)
-    input_embedding = Flatten(Embedding(class_dim, noise_dim)(labels))
+    input_embedding = Flatten()(Embedding(class_dim, noise_dim)(labels))
 
-    x = Dense(7 * 7 * 256, activation="relu")(input_embedding)
+    mul_input = multiply([noise, input_embedding])
+    x = Dense(7 * 7 * 256, activation="relu", input_dim=noise_dim)(mul_input)
     x = Reshape((7, 7, 256))(x)
     if architecture == "acgan":
         x = BatchNormalization(momentum=0.8)(x)

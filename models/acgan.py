@@ -25,6 +25,7 @@ class ACGAN(Model):
         # https://keras.io/guides/customizing_what_happens_in_fit/
 
         # Get the batch size
+        inputs = inputs[0]
         real_images, target_labels = inputs[0], inputs[1]
         batch_size = tf.shape(real_images)[0]
 
@@ -44,18 +45,23 @@ class ACGAN(Model):
         for i in range(self.d_steps):
             # Get the latent vector
             random_latent_vectors = tf.random.normal(shape=(batch_size, self.latent_dim))
-            sampled_labels = np.random.randint(0, self.n_classes, batch_size)
+            sampled_labels = tf.random.uniform(shape=(batch_size, 1), minval=0, maxval=self.n_classes, dtype=tf.int32)
             with tf.GradientTape() as tape:
                 # Generate fake images from the latent vector
-                fake_images = self.generator([random_latent_vectors, sampled_labels.reshape((-1, 1))], training=True)
+                fake_images = self.generator([random_latent_vectors, sampled_labels], training=True)
                 # Get the logits for the fake images
                 fake_logits, fake_cls_logits = self.discriminator(fake_images, training=True)
                 # Get the logits for real images
                 real_logits, real_cls_logits = self.discriminator(real_images, training=True)
 
                 # Calculate discriminator loss using fake and real logits
-                d_loss = self.d_loss_fn(real_img=real_logits, fake_img=fake_logits)
-                d_loss_cls = self.d_loss_cls_fn(real_cls_logits=real_cls_logits, fake_cls_logits=fake_cls_logits)
+                d_loss = self.d_loss_fn(real_img_logits=real_logits, fake_img_logits=fake_logits)
+                d_loss_cls = self.d_loss_cls_fn(
+                    real_cls_logits=real_cls_logits,
+                    fake_cls_logits=fake_cls_logits,
+                    real_labels=target_labels,
+                    fake_labels=sampled_labels,
+                )
                 d_loss += d_loss_cls
 
                 # gradient penalty scope
@@ -70,15 +76,15 @@ class ACGAN(Model):
         # Train the generator now.
         # Get the latent vector
         random_latent_vectors = tf.random.normal(shape=(2 * batch_size, self.latent_dim))
-        sampled_labels = np.random.randint(0, self.n_classes, 2 * batch_size)
+        sampled_labels = tf.random.uniform(shape=(2 * batch_size, 1), minval=0, maxval=self.n_classes, dtype=tf.int32)
         with tf.GradientTape() as tape:
             # Generate fake images using the generator
-            generated_images = self.generator([random_latent_vectors, sampled_labels.reshape((-1, 1))], training=True)
+            generated_images = self.generator([random_latent_vectors, sampled_labels], training=True)
             # Get the discriminator logits for fake images
             gen_img_logits, gen_cls_logits = self.discriminator(generated_images, training=False)
             # Calculate the generator loss
             g_loss = self.g_loss_fn(img_logits=gen_img_logits)
-            g_loss_cls = self.g_loss_cls_fn(real_cls_logits=real_cls_logits, fake_cls_logits=fake_cls_logits)
+            g_loss_cls = self.g_loss_cls_fn(cls_logits=gen_cls_logits, labels=sampled_labels)
             g_loss = g_loss_cls - g_loss
 
         # Get the gradients w.r.t the generator loss

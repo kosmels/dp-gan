@@ -55,8 +55,10 @@ def get_acgan_train_games(config: Dict[str, Any]) -> Tuple[np.ndarray, np.ndarra
     class_folders = config.get("class_root_path")
     train_images = []
     train_labels = np.array([], dtype=np.int32)
+    print(class_folders)
     for class_idx, folder in enumerate(class_folders):
         data_root = os.path.join(config.get("data_path"), folder)
+        print(data_root)
         image_paths = os.listdir(data_root)
         for image_path in image_paths:
             train_images.append(cv2.imread(os.path.join(data_root, image_path)))
