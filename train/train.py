@@ -70,8 +70,9 @@ def train_wgan():
 def train_acgan():
     # we will reshape each sample to (28, 28, 1) and normalize the pixel values in [-1, 1].
     yaml_path = "configs/acgan_config_default.yml"
-    dataset_config = parse_config(yaml_path)["dataset"]
-    train_config = parse_config(yaml_path)["train"]
+    parsed_config = parse_config(yaml_path)
+    dataset_config = parsed_config["dataset"]
+    train_config = parsed_config["train"]
     print(dataset_config)
     train_images, train_labels = get_acgan_train_games(dataset_config)
     train_images = (train_images - 127.5) / 127.5
@@ -91,7 +92,13 @@ def train_acgan():
     discriminator_optimizer = Adam(learning_rate=train_config["discriminator_lr"], beta_1=d_beta_1, beta_2=d_beta_2)
 
     # Callbacks
-    cbk = GANMonitor(num_img=3, latent_dim=dataset_config["noise_dim"])
+    cbk = GANMonitor(
+        output_dir=train_config["sampled_output_dir"],
+        model_name=parsed_config["model"]["type"],
+        n_classes=class_dim,
+        num_img=3,
+        latent_dim=dataset_config["noise_dim"],
+    )
 
     # Get the wgan model
     wgan = ACGAN(
@@ -113,12 +120,11 @@ def train_acgan():
     )
 
     # Start training
-    print(f"FIT")
-    print(train_labels)
     wgan.fit(
         (train_images, train_labels),
         batch_size=train_config["batch_size"],
         epochs=train_config["epochs"],
+        verbose=0,
         callbacks=[cbk],
     )
 
