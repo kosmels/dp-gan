@@ -19,8 +19,9 @@ from train.losses import (acgan_disc_cls_loss, acgan_disc_loss,
 def train_wgan():
     # we will reshape each sample to (28, 28, 1) and normalize the pixel values in [-1, 1].
     yaml_path = "configs/wpgan_config_default.yml"
-    dataset_config = parse_config(yaml_path)["dataset"]
-    train_config = parse_config(yaml_path)["train"]
+    parsed_config = parse_config(yaml_path)
+    dataset_config = parsed_config["dataset"]
+    train_config = parsed_config["train"]
     train_images = get_train_images(dataset_config)
     train_images = train_images.reshape(train_images.shape[0], *dataset_config["image_shape"]).astype("float32")
     train_images = (train_images - 127.5) / 127.5
@@ -39,7 +40,12 @@ def train_wgan():
     discriminator_optimizer = Adam(learning_rate=train_config["discriminator_lr"], beta_1=0.5, beta_2=0.9)
 
     # Callbacks
-    cbk = GANMonitor(num_img=3, latent_dim=dataset_config["noise_dim"])
+    cbk = GANMonitor(
+        output_dir=train_config["sampled_output_dir"],
+        model_name=parsed_config["model"]["type"],
+        num_img=3,
+        latent_dim=dataset_config["noise_dim"],
+    )
 
     # Get the wgan model
     wgan = WGAN(

@@ -5,7 +5,7 @@ dataset:
   noise_dim: 128
 
 model:
-  type: "WGAN"
+  type: "ACGAN"
 
 train:
   batch_size: 32
@@ -14,3 +14,4 @@ train:
   generator_betas: [0.5, 0.9]
   discriminator_lr: 0.0002
   discriminator_betas: [0.5, 0.9]
+  sampled_output_dir: "outputs"
