@@ -1,6 +1,6 @@
 dataset:
   data_path: "datasets/CX-Brights"
-  class_root_path: "OD_bright/korozia"
+  class_root_path: "OD_bright/cierneFlaky"
   image_shape: [224, 224, 3]
   noise_dim: 128
 

@@ -1,4 +1,7 @@
-import numpy as np
+"""
+Main parts of code from https://keras.io/examples/generative/wgan_gp/
+Reimplemented and adjusted for ACGAN purposes.
+"""
 import tensorflow as tf
 from tensorflow.keras.models import Model
 

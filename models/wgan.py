@@ -1,17 +1,6 @@
 """
-## Wasserstein GAN (WGAN) with Gradient Penalty (GP)
-The original [Wasserstein GAN](https://arxiv.org/abs/1701.07875) leverages
-the Wasserstein distance to produce a value function that has better theoretical
-properties than the value function used in the original GAN paper. WGAN requires that
-the discriminator (aka the critic) lie within the space of 1-Lipschitz functions.
-The authors proposed the idea of weight clipping to achieve this constraint. Though
-weight clipping works, it can be a problematic way to enforce 1-Lipschitz constraint
-and can cause undesirable behavior, e.g. a very deep WGAN discriminator (critic)
-often fails to converge.
-[WGAN-GP](https://arxiv.org/pdf/1704.00028.pdf) proposed an alternative to weight
-clipping to ensure smooth training. Instead of clipping the weights, the authors
-proposed a "gradient penalty": adding a loss term that keeps the L2
-norm of the discriminator gradients close to 1.
+Main parts of code from https://keras.io/examples/generative/wgan_gp/
+Reimplemented and adjusted for our purposes.
 """
 import tensorflow as tf
 from tensorflow.keras.models import Model
