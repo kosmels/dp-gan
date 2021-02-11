@@ -31,20 +31,6 @@ class ACGAN(Model):
         inputs = inputs[0]
         real_images, target_labels = inputs[0], inputs[1]
         batch_size = tf.shape(real_images)[0]
-
-        # For each batch, we are going to perform the
-        # following steps as laid out in the original paper.
-        # 1. Train the generator and get the generator loss
-        # 2. Train the discriminator and get the discriminator loss
-        # 3. Calculate the gradient penalty
-        # 4. Multiply this gradient penalty with a constant weight factor
-        # 5. Add gradient penalty to the discriminator loss
-        # 6. Return generator and discriminator losses as a loss dictionary.
-
-        # Train discriminator first. The original paper recommends training
-        # the discriminator for `x` more steps (typically 5) as compared to
-        # one step of the generator. Here we will train it for 3 extra steps
-        # as compared to 5 to reduce the training time.
         for i in range(self.d_steps):
             # Get the latent vector
             random_latent_vectors = tf.random.normal(shape=(batch_size, self.latent_dim))
@@ -58,14 +44,15 @@ class ACGAN(Model):
                 real_logits, real_cls_logits = self.discriminator(real_images, training=True)
 
                 # Calculate discriminator loss using fake and real logits
-                d_loss = self.d_loss_fn(real_img_logits=real_logits, fake_img_logits=fake_logits)
+                d_loss = self.d_loss_fn(real_img=real_logits, fake_img=fake_logits)
+                print(f"Debug")
                 d_loss_cls = self.d_loss_cls_fn(
                     real_cls_logits=real_cls_logits,
                     fake_cls_logits=fake_cls_logits,
                     real_labels=target_labels,
                     fake_labels=sampled_labels,
                 )
-                d_loss += d_loss_cls
+                d_loss += 5*d_loss_cls
 
                 # gradient penalty scope
                 # gp = self.gradient_penalty(batch_size, inputs, fake_images)
@@ -86,12 +73,14 @@ class ACGAN(Model):
             # Get the discriminator logits for fake images
             gen_img_logits, gen_cls_logits = self.discriminator(generated_images, training=False)
             # Calculate the generator loss
-            g_loss = self.g_loss_fn(img_logits=gen_img_logits)
+            g_loss = self.g_loss_fn(fake_img=gen_img_logits)
             g_loss_cls = self.g_loss_cls_fn(cls_logits=gen_cls_logits, labels=sampled_labels)
-            g_loss = g_loss_cls - g_loss
+            print(g_loss_cls)
+            g_loss = 5*g_loss_cls - g_loss
 
         # Get the gradients w.r.t the generator loss
         gen_gradient = tape.gradient(g_loss, self.generator.trainable_variables)
         # Update the weights of the generator using the generator optimizer
         self.g_optimizer.apply_gradients(zip(gen_gradient, self.generator.trainable_variables))
+        print(f"d_loss: {d_loss}, g_loss: {g_loss}")
         return {"d_loss": d_loss, "g_loss": g_loss}

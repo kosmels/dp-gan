@@ -113,10 +113,11 @@ def train_acgan():
     wgan.compile(
         d_optimizer=discriminator_optimizer,
         g_optimizer=generator_optimizer,
-        d_loss_fn=acgan_disc_loss,
+        d_loss_fn=discriminator_loss,
         d_loss_cls_fn=acgan_disc_cls_loss,
-        g_loss_fn=acgan_gen_loss,
+        g_loss_fn=generator_loss,
         g_loss_cls_fn=acgan_gen_cls_loss,
+        # run_eagerly=True
     )
 
     # Start training
