@@ -12,10 +12,8 @@ from train.utils import create_clean_dir
 
 
 class GANMonitor(Callback):
-    def __init__(self, output_dir, model_name, n_classes, num_img=6, latent_dim=128):
-        current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-        self.output_dir = create_clean_dir(os.path.join(output_dir, f"{model_name}_{current_time}"))
-        self.model_name = model_name
+    def __init__(self, output_dir, n_classes, num_img=6, latent_dim=128):
+        self.output_dir = output_dir
         self.n_classes = n_classes
         self.num_img = num_img
         self.latent_dim = latent_dim

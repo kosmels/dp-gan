@@ -1,25 +1,24 @@
 import tensorflow as tf
 
 
-def acgan_disc_loss(real_img_logits, fake_img_logits):
-    # print(real_img_logits)
-    real_loss = tf.nn.sigmoid_cross_entropy_with_logits(tf.ones(tf.shape(real_img_logits)), real_img_logits)
-    fake_loss = tf.nn.sigmoid_cross_entropy_with_logits(tf.zeros(tf.shape(fake_img_logits)), fake_img_logits)
-    return fake_loss + real_loss
-
-
 def acgan_disc_cls_loss(real_cls_logits, fake_cls_logits, real_labels, fake_labels):
-    real_loss = tf.nn.softmax_cross_entropy_with_logits(real_labels, real_cls_logits)
-    fake_loss = tf.nn.softmax_cross_entropy_with_logits(fake_labels, fake_cls_logits)
+    real_loss = tf.keras.losses.sparse_categorical_crossentropy(real_labels, real_cls_logits)
+    fake_loss = tf.keras.losses.sparse_categorical_crossentropy(fake_labels, fake_cls_logits)
     return fake_loss + real_loss
-
-
-def acgan_gen_loss(img_logits):
-    return tf.nn.sigmoid_cross_entropy_with_logits(tf.ones(tf.shape(img_logits)), img_logits)
 
 
 def acgan_gen_cls_loss(cls_logits, labels):
-    return tf.nn.softmax_cross_entropy_with_logits(labels, cls_logits)
+    return tf.keras.losses.sparse_categorical_crossentropy(labels, cls_logits)
+
+
+def discriminator_bce_loss(real_img, fake_img):
+    real_loss = tf.keras.losses.binary_crossentropy(tf.ones_like(real_img), real_img)
+    fake_loss = tf.keras.losses.binary_crossentropy(tf.zeros_like(fake_img), fake_img)
+    return real_loss + fake_loss
+
+
+def generator_bce_loss(fake_img):
+    return tf.keras.losses.binary_crossentropy(tf.ones_like(fake_img), fake_img)
 
 
 # Define the loss functions to be used for discrimiator

@@ -64,8 +64,8 @@ def get_acgan_train_games(config: Dict[str, Any]) -> Tuple[np.ndarray, np.ndarra
             train_images.append(cv2.imread(os.path.join(data_root, image_path)))
         train_labels = np.append(train_labels, np.full((len(image_paths, )), fill_value=class_idx, dtype=np.int32))
 
-    train_labels = np.array(train_labels).reshape((-1, 1))
-    return np.array(train_images), train_labels
+    # train_labels = np.array(train_labels).reshape((-1, 1))
+    return np.array(train_images), np.array(train_labels)
 
 
 if __name__ == "__main__":

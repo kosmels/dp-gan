@@ -3,11 +3,9 @@ import os
 import cv2
 import numpy as np
 from scipy.linalg import sqrtm
-from tensorflow.keras.applications.inception_v3 import (InceptionV3,
-                                                        preprocess_input)
+from tensorflow.keras.applications.inception_v3 import InceptionV3, preprocess_input
 
-from datasets.preprocessing import (get_acgan_train_games, get_train_images,
-                                    parse_config)
+from datasets.preprocessing import get_acgan_train_games, get_train_images, parse_config
 
 
 def calculate_fid(incept_model, input_images, target_images):

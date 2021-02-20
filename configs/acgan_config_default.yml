@@ -8,7 +8,7 @@ model:
   type: "ACGAN"
 
 train:
-  batch_size: 32
+  batch_size: 31
   epochs: 5000
   generator_lr: 0.0002
   generator_betas: [0.5, 0.9]
