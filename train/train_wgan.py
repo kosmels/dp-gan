@@ -42,8 +42,7 @@ def train_wgan():
     output_dir = create_clean_dir(
         os.path.join(
             train_config["train_log_root"],
-            f"{parsed_config['model']['type']}_{dataset_config['class_root_path'].split('/')[-1]}_{current_time}",
-            "images",
+            f"{parsed_config['model']['type']}_{dataset_config['class_root_path'].split('/')[-1]}_{current_time}"
         )
     )
 
@@ -51,19 +50,22 @@ def train_wgan():
 
     # Create callbacks
     # Visualize samples after x epochs
+    images_dir = create_clean_dir(os.path.join(output_dir, "images"))
     wgan_visualizer = WGAN_Visual_Monitor(
-        output_dir=output_dir,
-        num_img=3,
+        output_dir=images_dir,
+        num_img=train_config["image_visual_num"],
         latent_dim=dataset_config["noise_dim"],
+        visual_frequency=train_config["image_visual_frequency"]
     )
 
     # Save model after each epoch, only better models based on discriminator loss
-    checkpoint_dir = os.path.join(output_dir, train_config["train_checkpoints"])
+    checkpoint_dir = create_clean_dir(os.path.join(output_dir, train_config["train_checkpoints"]))
+    checkpoint_name = os.path.join(checkpoint_dir, train_config["train_checkpoints"], "epoch_{epoch:04d}.hdf5")
     wgan_model_checkpointer = ModelCheckpoint(
-        filepath=checkpoint_dir, monitor="d_loss", mode="max", save_best_only=True
+        filepath=checkpoint_name, monitor="d_loss", mode="max", save_best_only=True
     )
 
-    tensorboard_dir = os.path.join(output_dir, "logs")
+    tensorboard_dir = os.path.join(train_config["tensorboard_root"], f"{output_dir.split('/')[-1]}")
     wgan_tensorboard = TensorBoard(log_dir=tensorboard_dir)
 
     # Get the wgan model

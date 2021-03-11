@@ -22,18 +22,19 @@ class CustomModelCheckpoint(Callback):
 
 
 class WGAN_Visual_Monitor(Callback):
-    def __init__(self, output_dir, num_img=6, latent_dim=128):
+    def __init__(self, output_dir, num_img: int, latent_dim: int, visual_frequency: int):
         super().__init__()
         self.output_dir = output_dir
         self.num_img = num_img
         self.latent_dim = latent_dim
+        self.visual_frequency = visual_frequency
 
     def on_epoch_end(self, epoch, logs=None):
         random_latent_vectors = tf.random.normal(shape=(self.num_img, self.latent_dim))
         generated_images = self.model.generator(random_latent_vectors)
         generated_images = (generated_images * 127.5) + 127.5
 
-        if (epoch + 1) % 10 == 0:
+        if (epoch + 1) % self.visual_frequency == 0:
             print(f"Finished epoch number: {epoch}")
             for i in range(self.num_img):
                 img = generated_images[i].numpy()

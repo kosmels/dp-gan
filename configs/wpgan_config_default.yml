@@ -15,6 +15,10 @@ train:
   discriminator_lr: 0.0002
   discriminator_betas: [0.5, 0.9]
 
+  image_visual_frequency: 20
+  image_visual_num: 5
+
   train_log_root: "outputs"
-  train_checkpoints: "logs/checkpoints/epoch_{epoch:04d}.hdf5"
+  train_checkpoints: "checkpoints"
+  tensorboard_root: "tensorboard_logs"
 
