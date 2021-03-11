@@ -1,6 +1,6 @@
 dataset:
   data_path: "datasets/CX-Brights"
-  class_root_path: "OD_bright/cierneFlaky"
+  class_root_path: "OD_bright/otlakPriecny"
   image_shape: [224, 224, 3]
   noise_dim: 128
 
@@ -14,3 +14,7 @@ train:
   generator_betas: [0.5, 0.9]
   discriminator_lr: 0.0002
   discriminator_betas: [0.5, 0.9]
+
+  train_log_root: "outputs"
+  train_checkpoints: "logs/checkpoints/epoch_{epoch:04d}.hdf5"
+

@@ -1,20 +1,9 @@
 import tensorflow as tf
-from tensorflow.keras.layers import (
-    Activation,
-    BatchNormalization,
-    Conv2D,
-    Dense,
-    Embedding,
-    Flatten,
-    Input,
-    LeakyReLU,
-    Reshape,
-    UpSampling2D,
-    ZeroPadding2D,
-    Conv2DTranspose,
-    concatenate,
-    multiply,
-)
+from tensorflow.keras.layers import (Activation, BatchNormalization, Conv2D,
+                                     Conv2DTranspose, Dense, Embedding,
+                                     Flatten, Input, LeakyReLU, Reshape,
+                                     UpSampling2D, ZeroPadding2D, concatenate,
+                                     multiply)
 from tensorflow.keras.models import Model, Sequential
 
 from models.custom_layers import upsample_block
@@ -40,7 +29,7 @@ def get_generator_model_v3(noise_dim: int, class_dim: int, architecture: str = "
             use_bn=True,
             padding="same",
             use_dropout=False,
-        )   # 6 x 6 x 128
+        )  # 6 x 6 x 128
         # x = ZeroPadding2D(padding=((0, 1), (0, 1)))(x)  # 7 x 7 x 128
         x = upsample_block(
             x,
@@ -51,7 +40,7 @@ def get_generator_model_v3(noise_dim: int, class_dim: int, architecture: str = "
             use_bn=True,
             padding="same",
             use_dropout=False,
-        )   # 14 x 14 x 64
+        )  # 14 x 14 x 64
         x = upsample_block(
             x,
             32,
@@ -61,7 +50,7 @@ def get_generator_model_v3(noise_dim: int, class_dim: int, architecture: str = "
             use_bn=True,
             padding="same",
             use_dropout=False,
-        )   # 28 x 28 x 32
+        )  # 28 x 28 x 32
         x = upsample_block(
             x,
             16,
@@ -76,7 +65,6 @@ def get_generator_model_v3(noise_dim: int, class_dim: int, architecture: str = "
         # output = Conv2D(1, (3, 3), activation="tanh", strides=(1, 1), use_bias=False, padding="same")(x)
 
         return Model([noise, labels], output)
-
 
 
 def get_generator_model_v2(noise_dim: int, class_dim: int, architecture: str = "acgan"):

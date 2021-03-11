@@ -1,4 +1,5 @@
-from tensorflow.keras.layers import BatchNormalization, Conv2D, Dropout, UpSampling2D
+from tensorflow.keras.layers import (BatchNormalization, Conv2D, Dropout,
+                                     UpSampling2D)
 
 
 def conv_block(
