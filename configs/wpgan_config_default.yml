@@ -1,6 +1,6 @@
 dataset:
   data_path: "datasets/CX-Brights"
-  class_root_path: "OD_bright/otlakPriecny"
+  class_root_path: "OD_bright/nabrus"
   image_shape: [224, 224, 3]
   noise_dim: 128
 
@@ -10,6 +10,8 @@ model:
 train:
   batch_size: 32
   epochs: 5000
+  checkpoint_freq: 20
+
   generator_lr: 0.0002
   generator_betas: [0.5, 0.9]
   discriminator_lr: 0.0002

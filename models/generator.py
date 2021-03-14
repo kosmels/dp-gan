@@ -1,9 +1,20 @@
 import tensorflow as tf
-from tensorflow.keras.layers import (Activation, BatchNormalization, Conv2D,
-                                     Conv2DTranspose, Dense, Embedding,
-                                     Flatten, Input, LeakyReLU, Reshape,
-                                     UpSampling2D, ZeroPadding2D, concatenate,
-                                     multiply)
+from tensorflow.keras.layers import (
+    Activation,
+    BatchNormalization,
+    Conv2D,
+    Conv2DTranspose,
+    Dense,
+    Embedding,
+    Flatten,
+    Input,
+    LeakyReLU,
+    Reshape,
+    UpSampling2D,
+    ZeroPadding2D,
+    concatenate,
+    multiply,
+)
 from tensorflow.keras.models import Model, Sequential
 
 from models.custom_layers import upsample_block

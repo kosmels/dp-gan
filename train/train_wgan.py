@@ -2,6 +2,7 @@ import datetime
 import os
 import shutil
 
+import numpy as np
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from tensorflow.keras.optimizers import Adam
 
@@ -23,6 +24,7 @@ def train_wgan():
     train_images = get_train_images(dataset_config)
     train_images = train_images.reshape(train_images.shape[0], *dataset_config["image_shape"]).astype("float32")
     train_images = (train_images - 127.5) / 127.5
+    print(f"Number of train images: {train_images}")
 
     d_model = get_discriminator_model(dataset_config["image_shape"])
     d_model.summary()
@@ -42,7 +44,7 @@ def train_wgan():
     output_dir = create_clean_dir(
         os.path.join(
             train_config["train_log_root"],
-            f"{parsed_config['model']['type']}_{dataset_config['class_root_path'].split('/')[-1]}_{current_time}"
+            f"{parsed_config['model']['type']}_{dataset_config['class_root_path'].split('/')[-1]}_{current_time}",
         )
     )
 
@@ -55,14 +57,20 @@ def train_wgan():
         output_dir=images_dir,
         num_img=train_config["image_visual_num"],
         latent_dim=dataset_config["noise_dim"],
-        visual_frequency=train_config["image_visual_frequency"]
+        visual_frequency=train_config["image_visual_frequency"],
     )
 
     # Save model after each epoch, only better models based on discriminator loss
     checkpoint_dir = create_clean_dir(os.path.join(output_dir, train_config["train_checkpoints"]))
-    checkpoint_name = os.path.join(checkpoint_dir, train_config["train_checkpoints"], "epoch_{epoch:04d}.hdf5")
+    checkpoint_name = os.path.join(checkpoint_dir, "epoch_{epoch:04d}.hdf5")
+    print(f"Checkpoint saved after 20 epochs. Step size: {np.ceil(len(train_images) / train_config['batch_size'])}")
     wgan_model_checkpointer = ModelCheckpoint(
-        filepath=checkpoint_name, monitor="d_loss", mode="max", save_best_only=True
+        filepath=checkpoint_name,
+        monitor="d_loss",
+        save_freq=int(np.ceil(len(train_images) / train_config["batch_size"]) * train_config['checkpoint_freq']),
+        save_best_only=False,
+        save_weights_only=True,
+        verbose=1
     )
 
     tensorboard_dir = os.path.join(train_config["tensorboard_root"], f"{output_dir.split('/')[-1]}")

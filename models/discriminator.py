@@ -13,9 +13,7 @@ crop the final output to match the shape with input shape.
 from typing import Tuple
 
 import tensorflow as tf
-from tensorflow.keras.layers import (BatchNormalization, Conv2D, Dense,
-                                     Dropout, Flatten, Input, LeakyReLU,
-                                     ZeroPadding2D)
+from tensorflow.keras.layers import BatchNormalization, Conv2D, Dense, Dropout, Flatten, Input, LeakyReLU, ZeroPadding2D
 from tensorflow.keras.models import Model, Sequential
 
 from models.custom_layers import conv_block
