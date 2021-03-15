@@ -1,6 +1,6 @@
 dataset:
   data_path: "datasets/CX-Brights"
-  class_root_path: "OD_bright/nabrus"
+  class_root_path: "OD_bright/otlakPriecny"
   image_shape: [224, 224, 3]
   noise_dim: 128
 

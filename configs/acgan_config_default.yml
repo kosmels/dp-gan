@@ -1,14 +1,26 @@
 dataset:
   data_path: "datasets/CX-Brights"
-  class_root_path: ["OD_bright/korozia", "OD_bright/cierneFlaky", "OD_bright/otlakPriecny"]
+  class_root_path:
+    - "OD_bright/korozia"
+    - "OD_bright/cierneFlaky"
+    - "OD_bright/otlakPriecny"
+    - "OD_bright/nabrus"
+    - "OD_bright/nedohonovanyPovrch"
+    - "OD_bright/otlakPozdlzny"
+    - "OD_bright/ryha"
+    - "OD_bright/sekance"
+
+  # As the number of images in each class differs we need to cap
+  # it to prevent mode collapse into certain class.
+  num_images_per_class: 299
   image_shape: [224, 224, 3]
   noise_dim: 128
 
 model:
-  type: "ACGAN"
+  type: "ACWGAN_all_classes"
 
 train:
-  batch_size: 31
+  batch_size: 73
   epochs: 5000
   generator_lr: 0.0002
   generator_betas: [0.5, 0.9]

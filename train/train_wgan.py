@@ -24,7 +24,6 @@ def train_wgan():
     train_images = get_train_images(dataset_config)
     train_images = train_images.reshape(train_images.shape[0], *dataset_config["image_shape"]).astype("float32")
     train_images = (train_images - 127.5) / 127.5
-    print(f"Number of train images: {train_images}")
 
     d_model = get_discriminator_model(dataset_config["image_shape"])
     d_model.summary()
@@ -67,10 +66,10 @@ def train_wgan():
     wgan_model_checkpointer = ModelCheckpoint(
         filepath=checkpoint_name,
         monitor="d_loss",
-        save_freq=int(np.ceil(len(train_images) / train_config["batch_size"]) * train_config['checkpoint_freq']),
+        save_freq=int(np.ceil(len(train_images) / train_config["batch_size"]) * train_config["checkpoint_freq"]),
         save_best_only=False,
         save_weights_only=True,
-        verbose=1
+        verbose=1,
     )
 
     tensorboard_dir = os.path.join(train_config["tensorboard_root"], f"{output_dir.split('/')[-1]}")

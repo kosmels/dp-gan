@@ -51,16 +51,13 @@ class ACGAN(Model):
         # https://keras.io/guides/customizing_what_happens_in_fit/
 
         # Get the batch size
-        print(len(inputs))
         inputs = inputs[0]
         real_images, target_labels = inputs[0], inputs[1]
-        print(target_labels)
         batch_size = tf.shape(real_images)[0]
         for i in range(self.d_steps):
             # Get the latent vector
             random_latent_vectors = tf.random.normal(shape=(batch_size, self.latent_dim))
             sampled_labels = tf.random.uniform(shape=(batch_size,), minval=0, maxval=self.n_classes, dtype=tf.int32)
-            print(sampled_labels)
             with tf.GradientTape() as tape:
                 # Generate fake images from the latent vector
                 fake_images = self.generator([random_latent_vectors, sampled_labels], training=True)
@@ -80,7 +77,7 @@ class ACGAN(Model):
                 # d_loss = d_loss + 5 * d_loss_cls
 
                 # gradient penalty scope
-                gp = self.gradient_penalty(batch_size, inputs[0], fake_images)
+                gp = self.gradient_penalty(batch_size, real_images, fake_images)
                 d_loss = d_loss + gp * self.gp_weight + 5 * d_loss_cls
 
             # Get the gradients w.r.t the discriminator loss
@@ -92,7 +89,6 @@ class ACGAN(Model):
         # Get the latent vector
         random_latent_vectors = tf.random.normal(shape=(2 * batch_size, self.latent_dim))
         sampled_labels = tf.random.uniform(shape=(2 * batch_size,), minval=0, maxval=self.n_classes, dtype=tf.int32)
-        print(sampled_labels)
         with tf.GradientTape() as tape:
             # Generate fake images using the generator
             generated_images = self.generator([random_latent_vectors, sampled_labels], training=True)

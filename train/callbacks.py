@@ -50,12 +50,12 @@ class ACGAN_Visual_Monitor(Callback):
         self.latent_dim = latent_dim
 
     def on_epoch_end(self, epoch, logs=None):
-        random_latent_vectors = tf.random.normal(shape=(self.num_img, self.latent_dim))
-        sampled_labels = tf.random.uniform(shape=(self.num_img, 1), minval=0, maxval=self.n_classes, dtype=tf.int32)
+        random_latent_vectors = tf.random.normal(shape=(self.n_classes, self.latent_dim))
+        sampled_labels = tf.reshape(tf.range(0, self.n_classes, dtype=tf.int32), shape=(-1, 1))
         generated_images = self.model.generator([random_latent_vectors, sampled_labels])
         generated_images = (generated_images * 127.5) + 127.5
 
-        if (epoch + 1) % 10 == 0:
+        if (epoch + 1) % 25 == 0:
             print(f"Finished epoch number: {epoch}")
             for i in range(self.num_img):
                 img = generated_images[i].numpy()
