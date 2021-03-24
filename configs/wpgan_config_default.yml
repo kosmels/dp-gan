@@ -1,6 +1,6 @@
 dataset:
   data_path: "datasets/CX-Brights"
-  class_root_path: "OD_bright/otlakPriecny"
+  class_root_path: "OD_bright/cierneFlaky"
   image_shape: [224, 224, 3]
   noise_dim: 128
 
@@ -8,7 +8,7 @@ model:
   type: "WGAN"
 
 train:
-  batch_size: 32
+  batch_size: 16
   epochs: 5000
   checkpoint_freq: 20
 
