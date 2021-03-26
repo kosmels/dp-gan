@@ -46,7 +46,10 @@ def get_train_images(config: Dict[str, Any]) -> np.ndarray:
     image_paths = os.listdir(data_root)
     train_images = []
     for image_path in image_paths:
-        train_images.append(cv2.imread(os.path.join(data_root, image_path)))
+        image = cv2.imread(os.path.join(data_root, image_path))
+        train_images.append(image)
+        train_images.append(cv2.flip(image, 1))
+        train_images.append(cv2.flip(image, 0))
 
     return np.array(train_images)
 
@@ -57,10 +60,15 @@ def get_acgan_train_games(config: Dict[str, Any]) -> Tuple[np.ndarray, np.ndarra
     train_labels = np.array([], dtype=np.int32)
     for class_idx, folder in enumerate(class_folders):
         data_root = os.path.join(config.get("data_path"), folder)
-        image_paths = os.listdir(data_root)[:config.get("num_images_per_class")]
+        image_paths = os.listdir(data_root)
+        np.random.shuffle(image_paths)
+        image_paths = image_paths[:config.get("num_images_per_class")]
         for image_path in image_paths:
-            train_images.append(cv2.imread(os.path.join(data_root, image_path)))
-        train_labels = np.append(train_labels, np.full((len(image_paths, )), fill_value=class_idx, dtype=np.int32))
+            image = cv2.imread(os.path.join(data_root, image_path))
+            train_images.append(image)
+            train_images.append(cv2.flip(image, 1))
+            train_images.append(cv2.flip(image, 0))
+        train_labels = np.append(train_labels, np.full((len(image_paths, ) * 3), fill_value=class_idx, dtype=np.int32))
 
     return np.array(train_images), np.array(train_labels)
 

@@ -37,7 +37,7 @@ def train_acgan():
 
     class_dim = len(dataset_config["class_root_path"])
     logger.info(f"Loaded {len(train_images)} images for {class_dim} classes.")
-    logger.debug(f"Loaded classes: {dataset_config['class_root_path']}")
+    logger.info(f"Loaded classes: {dataset_config['class_root_path']}")
     d_model = get_discriminator_model_v3(dataset_config["image_shape"], class_dim)
     d_model.summary()
 

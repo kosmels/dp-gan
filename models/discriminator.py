@@ -1,20 +1,8 @@
-"""
-## Create the discriminator (aka critic in the original WGAN)
-The samples in the dataset have shape `(28, 28, 1)`. As we will be
-using strided convolutions, this can result in a shape with odd dimensions.
-For example,
-`(28, 28) -> Conv_s2 -> (14, 14) -> Conv_s2 -> (7, 7) -> Conv_s2 ->(3, 3)`.
-While doing upsampling in the generator, we won't get the same input shape
-as the original images if we aren't careful. To avoid this, we will do
-something much simpler. In the discriminator, we will "zero pad" the input
-to make the shape `(32, 32, 1)` for each sample, while in the generator we will
-crop the final output to match the shape with input shape.
-"""
 from typing import Tuple
 
 import tensorflow as tf
 from tensorflow.keras.layers import BatchNormalization, Conv2D, Dense, Dropout, Flatten, Input, LeakyReLU, ZeroPadding2D
-from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.models import Model
 
 from models.custom_layers import conv_block
 
@@ -68,7 +56,9 @@ def get_discriminator_model_v3(img_shape: Tuple[int, int, int], class_dim: int):
     )
 
     x = Flatten()(x)
-    # x = Dropout(0.2)(x)
+
+    x = Dense(1024, activation=LeakyReLU(0.2))(x)
+    x = Dense(512, activation=LeakyReLU(0.2))(x)
 
     real_prob_output = Dense(1, activation="linear")(x)
     class_output = Dense(class_dim, activation="softmax")(x)
