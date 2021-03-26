@@ -11,15 +11,22 @@ from tensorflow.keras.optimizers import Adam
 
 from datasets.preprocessing import get_acgan_train_games, parse_config
 from models.acgan import ACGAN
-from models.discriminator import (get_discriminator_model,
-                                  get_discriminator_model_v2,
-                                  get_discriminator_model_v3)
-from models.generator import (get_generator_model, get_generator_model_v2,
-                              get_generator_model_v3)
+from models.discriminator import (
+    get_discriminator_model,
+    get_discriminator_model_v2,
+    get_discriminator_model_v3,
+    get_discriminator_model_v4,
+)
+from models.generator import get_generator_model, get_generator_model_v2, get_generator_model_v3, get_generator_model_v4
 from train.callbacks import ACGAN_Visual_Monitor
-from train.losses import (acgan_disc_cls_loss, acgan_gen_cls_loss,
-                          discriminator_bce_loss, discriminator_loss,
-                          generator_bce_loss, generator_loss)
+from train.losses import (
+    acgan_disc_cls_loss,
+    acgan_gen_cls_loss,
+    discriminator_bce_loss,
+    discriminator_loss,
+    generator_bce_loss,
+    generator_loss,
+)
 from train.utils import create_clean_dir
 
 logger = logging.getLogger(__name__)

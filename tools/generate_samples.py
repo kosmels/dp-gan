@@ -1,21 +1,15 @@
 import cv2
 import tensorflow as tf
-from tensorflow.keras.applications.inception_v3 import (InceptionV3,
-                                                        preprocess_input)
+from tensorflow.keras.applications.inception_v3 import InceptionV3, preprocess_input
 from tensorflow.keras.optimizers import Adam
 
-from datasets.preprocessing import (get_acgan_train_games, get_train_images,
-                                    parse_config)
+from datasets.preprocessing import get_acgan_train_games, get_train_images, parse_config
 from metrics.evaluate import calculate_fid
 from models.acgan import ACGAN
-from models.discriminator import (get_discriminator_model,
-                                  get_discriminator_model_v2,
-                                  get_discriminator_model_v3)
-from models.generator import (get_generator_model, get_generator_model_v2,
-                              get_generator_model_v3)
+from models.discriminator import get_discriminator_model, get_discriminator_model_v2, get_discriminator_model_v3
+from models.generator import get_generator_model, get_generator_model_v2, get_generator_model_v3
 from models.wgan import WGAN
-from train.losses import (acgan_disc_cls_loss, acgan_gen_cls_loss,
-                          discriminator_loss, generator_loss)
+from train.losses import acgan_disc_cls_loss, acgan_gen_cls_loss, discriminator_loss, generator_loss
 
 
 def get_train_and_dataset_configs(config_path: str):
