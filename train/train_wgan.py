@@ -7,10 +7,10 @@ from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from tensorflow.keras.optimizers import Adam
 
 from datasets.preprocessing import get_train_images, parse_config
-from models.discriminator import get_discriminator_model
-from models.generator import get_generator_model
+from models.discriminator import get_discriminator_model, get_wgan_discriminator_model_v5
+from models.generator import get_generator_model, get_wgan_generator_model_v5
 from models.wgan import WGAN
-from train.callbacks import WGAN_Visual_Monitor
+from train.callbacks import WGAN_FID_Monitor, WGAN_Visual_Monitor
 from train.losses import discriminator_loss, generator_loss
 from train.utils import create_clean_dir
 
@@ -24,11 +24,12 @@ def train_wgan():
     train_images = get_train_images(dataset_config)
     train_images = train_images.reshape(train_images.shape[0], *dataset_config["image_shape"]).astype("float32")
     train_images = (train_images - 127.5) / 127.5
+    print(f"Loaded {train_images.shape[0]} images from {dataset_config['class_root_path']}")
 
-    d_model = get_discriminator_model(dataset_config["image_shape"])
+    d_model = get_wgan_discriminator_model_v5(dataset_config["image_shape"])
     d_model.summary()
 
-    g_model = get_generator_model(dataset_config["noise_dim"])
+    g_model = get_wgan_generator_model_v5(dataset_config["noise_dim"])
     g_model.summary()
 
     # Optimizer for both the networks
@@ -59,17 +60,28 @@ def train_wgan():
         visual_frequency=train_config["image_visual_frequency"],
     )
 
-    # Save model after each epoch, only better models based on discriminator loss
+    # Prepare directory for model checkpoints
     checkpoint_dir = create_clean_dir(os.path.join(output_dir, train_config["train_checkpoints"]))
-    checkpoint_name = os.path.join(checkpoint_dir, "epoch_{epoch:04d}.hdf5")
-    print(f"Checkpoint saved after 20 epochs. Step size: {np.ceil(len(train_images) / train_config['batch_size'])}")
-    wgan_model_checkpointer = ModelCheckpoint(
-        filepath=checkpoint_name,
-        monitor="d_loss",
-        save_freq=int(np.ceil(len(train_images) / train_config["batch_size"]) * train_config["checkpoint_freq"]),
-        save_best_only=False,
-        save_weights_only=True,
-        verbose=1,
+
+    """
+    WE HAVE SUPPRESSED ModeCheckpoint AS WE ARE NOW CALCULATING FID SCORE OVER TIME AND
+    BASED ON THIS METRIC WE ARE SAVING ONLY 1 BEST MODEL (April 5, 2021)
+    """
+    # checkpoint_name = os.path.join(checkpoint_dir, "epoch_{epoch:04d}.hdf5")
+    # print(f"Checkpoint saved after 20 epochs. Step size: {np.ceil(len(train_images) / train_config['batch_size'])}")
+    # wgan_model_checkpointer = ModelCheckpoint(
+    #     filepath=checkpoint_name,
+    #     monitor="d_loss",
+    #     save_freq=int(np.ceil(len(train_images) / train_config["batch_size"]) * train_config["checkpoint_freq"]),
+    #     save_best_only=False,
+    #     save_weights_only=True,
+    #     verbose=1,
+    # )
+
+    wgan_fid_callback = WGAN_FID_Monitor(
+        latent_dim=dataset_config["noise_dim"],
+        calculate_fid_frequency=train_config["calculate_fid_frequency"],
+        model_dir=checkpoint_dir,
     )
 
     tensorboard_dir = os.path.join(train_config["tensorboard_root"], f"{output_dir.split('/')[-1]}")
@@ -80,7 +92,7 @@ def train_wgan():
         discriminator=d_model,
         generator=g_model,
         latent_dim=dataset_config["noise_dim"],
-        discriminator_extra_steps=3,
+        discriminator_extra_steps=train_config["discriminator_extra_steps"],
     )
 
     # Compile the wgan model
@@ -96,7 +108,7 @@ def train_wgan():
         train_images,
         batch_size=train_config["batch_size"],
         epochs=train_config["epochs"],
-        callbacks=[wgan_visualizer, wgan_model_checkpointer, wgan_tensorboard],
+        callbacks=[wgan_visualizer, wgan_fid_callback, wgan_tensorboard],
     )
 
 

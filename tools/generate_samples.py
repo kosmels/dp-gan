@@ -7,7 +7,12 @@ from datasets.preprocessing import get_acgan_train_games, get_train_images, pars
 from metrics.evaluate import calculate_fid
 from models.acgan import ACGAN
 from models.discriminator import get_discriminator_model, get_discriminator_model_v2, get_discriminator_model_v3
-from models.generator import get_generator_model, get_generator_model_v2, get_generator_model_v3
+from models.generator import (
+    get_generator_model,
+    get_generator_model_v2,
+    get_generator_model_v3,
+    get_wgan_generator_model_v5,
+)
 from models.wgan import WGAN
 from train.losses import acgan_disc_cls_loss, acgan_gen_cls_loss, discriminator_loss, generator_loss
 
@@ -49,19 +54,20 @@ def generate_acgan_samples():
         # run_eagerly=True
     )
     acgan.built = True
-    acgan.load_weights("outputs/ACWGAN_2021-03-14_18:37:25/checkpoints/saved-model-1600.hdf5")
+    acgan.load_weights("outputs/ACWGAN_all_classes_flips_2021-03-26_17:52:04/checkpoints/saved-model-2600.hdf5")
 
-    n = 500
+    n = 200
     random_latent_vectors = tf.random.normal(shape=(n, dataset_config["noise_dim"]))
-    sampled_labels = tf.ones((n, 1), dtype=tf.int32)
-    sampled_labels *= 0
+    sampled_labels = tf.ones((n,), dtype=tf.int32)
+    sampled_labels *= 2
+
     # sampled_labels = tf.reshape(tf.range(0, 1, dtype=tf.int32), shape=(-1, 1))
     generated_images = acgan.generator([random_latent_vectors, sampled_labels])
     generated_images = (generated_images * 127.5) + 127.5
 
     for i in range(n):
         img = generated_images[i].numpy()
-        cv2.imwrite(f"visual-test/generated_{i+501}.jpg", img)
+        cv2.imwrite(f"visual-test/generated_{i}.jpg", img)
 
 
 def generate_wgan_samples(calculate_stats: bool = False):
@@ -117,5 +123,23 @@ def generate_wgan_samples(calculate_stats: bool = False):
             cv2.imwrite(f"visual-test/generated_{i+151}.jpg", img)
 
 
+def generate_wgan_samples_generator_only():
+    train_config, dataset_config = get_train_and_dataset_configs("configs/wpgan_config_default.yml")
+    train_images = get_train_images(dataset_config)
+    train_images = train_images.reshape(train_images.shape[0], *dataset_config["image_shape"]).astype("float32")
+
+    g_model = get_wgan_generator_model_v5(dataset_config["noise_dim"])
+
+    g_model.load_weights(f"outputs/WGAN_korozia_2021-04-02_17:33:25/checkpoints/best_model.h5")
+    n = 100
+    random_latent_vectors = tf.random.normal(shape=(n, dataset_config["noise_dim"]))
+    generated_images = g_model(random_latent_vectors)
+    generated_images = (generated_images * 127.5) + 127.5
+
+    for i in range(n):
+        img = generated_images[i].numpy()
+        cv2.imwrite(f"visual-test/generated_{i}.jpg", img)
+
+
 if __name__ == "__main__":
-    generate_wgan_samples()
+    generate_wgan_samples_generator_only()

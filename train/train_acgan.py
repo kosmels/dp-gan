@@ -45,10 +45,10 @@ def train_acgan():
     class_dim = len(dataset_config["class_root_path"])
     logger.info(f"Loaded {len(train_images)} images for {class_dim} classes.")
     logger.info(f"Loaded classes: {dataset_config['class_root_path']}")
-    d_model = get_discriminator_model_v3(dataset_config["image_shape"], class_dim)
+    d_model = get_discriminator_model_v4(dataset_config["image_shape"], class_dim)
     d_model.summary()
 
-    g_model = get_generator_model_v3(dataset_config["noise_dim"], class_dim)
+    g_model = get_generator_model_v4(dataset_config["noise_dim"], class_dim)
     g_model.summary()
 
     g_beta_1, g_beta_2 = train_config["generator_betas"][0], train_config["generator_betas"][1]

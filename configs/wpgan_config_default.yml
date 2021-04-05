@@ -1,6 +1,6 @@
 dataset:
   data_path: "datasets/CX-Brights"
-  class_root_path: "OD_bright/cierneFlaky"
+  class_root_path: "OD_bright/nabrus2"
   image_shape: [224, 224, 3]
   noise_dim: 128
 
@@ -12,13 +12,16 @@ train:
   epochs: 5000
   checkpoint_freq: 20
 
-  generator_lr: 0.0002
-  generator_betas: [0.5, 0.9]
-  discriminator_lr: 0.0002
-  discriminator_betas: [0.5, 0.9]
+  generator_lr: 0.0001
+  generator_betas: [0.0, 0.9]
+  discriminator_lr: 0.0004
+  discriminator_betas: [0.0, 0.9]
+  discriminator_extra_steps: 1
 
   image_visual_frequency: 20
   image_visual_num: 5
+
+  calculate_fid_frequency: 20
 
   train_log_root: "outputs"
   train_checkpoints: "checkpoints"

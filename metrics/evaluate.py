@@ -1,11 +1,12 @@
 import os
+import shutil
 
 import cv2
 import numpy as np
 from scipy.linalg import sqrtm
 from tensorflow.keras.applications.inception_v3 import InceptionV3, preprocess_input
 
-from datasets.preprocessing import get_acgan_train_games, get_train_images, parse_config
+from datasets.preprocessing import get_acgan_train_games, get_train_images, get_wgan_original_images, parse_config
 
 
 def calculate_fid(incept_model, input_images, target_images):
@@ -40,14 +41,21 @@ if __name__ == "__main__":
     parsed_config = parse_config(yaml_path)
     dataset_config = parsed_config["dataset"]
     train_config = parsed_config["train"]
-    train_images = get_train_images(dataset_config)
+    train_images = get_wgan_original_images(dataset_config)
     train_images = train_images.reshape(train_images.shape[0], *dataset_config["image_shape"]).astype("float32")
 
-    image_paths = os.listdir("outputs/wgan_23_11_2020_cierneFlaky_outputs")[1000:1224]
+    shutil.rmtree(f"visual-test/test")
+    image_paths = os.listdir("visual-test")
     test_images = []
     for image_path in image_paths:
-        test_images.append(cv2.imread(os.path.join("outputs/wgan_23_11_2020_cierneFlaky_outputs", image_path)))
+        test_images.append(cv2.imread(os.path.join("visual-test", image_path)))
     test_images = np.array(test_images)
+    # test_images = train_images[:100, ...]
+    train_images = train_images[150:155, ...]
+    os.makedirs(f"visual-test/test", exist_ok=True)
+    # for i in range(test_images.shape[0]):
+    #     cv2.imwrite(f"visual-test/test/_{i}_original.png", train_images[i, ...])
+    #     cv2.imwrite(f"visual-test/test/_{i}_generated.png", test_images[i, ...])
     print(test_images.shape, train_images.shape)
     train_images = preprocess_input(train_images)
     test_images = preprocess_input(test_images)

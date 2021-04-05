@@ -54,6 +54,17 @@ def get_train_images(config: Dict[str, Any]) -> np.ndarray:
     return np.array(train_images)
 
 
+def get_wgan_original_images(config: Dict[str, Any]) -> np.ndarray:
+    data_root = os.path.join(config.get("data_path"), config.get("class_root_path"))
+    image_paths = os.listdir(data_root)
+    train_images = []
+    for image_path in image_paths:
+        image = cv2.imread(os.path.join(data_root, image_path))
+        train_images.append(image)
+
+    return np.array(train_images)
+
+
 def get_acgan_train_games(config: Dict[str, Any]) -> Tuple[np.ndarray, np.ndarray]:
     class_folders = config.get("class_root_path")
     train_images = []
